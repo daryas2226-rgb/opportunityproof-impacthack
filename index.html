@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>OpportunityProof — Impact Edition</title>
+  <style>
+    :root{
+      --bg:#f7f5fa;--card:#fff;--ink:#2d2738;--muted:#746f7d;--accent:#6d5bd0;
+      --accent2:#ede9ff;--border:#e7e1ef;--ok:#19784b;--warn:#a75b00;
+      --shadow:0 8px 30px rgba(59,45,83,.08)
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+    button,input,select{font:inherit}
+    .topbar{position:sticky;top:0;z-index:10;background:rgba(247,245,250,.95);backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;
+      padding:16px max(20px,calc((100vw - 1180px)/2))}
+    .brand{font-weight:800;letter-spacing:-.02em}
+    .topbar nav{display:flex;gap:8px;flex-wrap:wrap}
+    .nav{border:0;background:transparent;padding:9px 12px;border-radius:10px;color:var(--muted);cursor:pointer}
+    .nav.active,.nav:hover{background:var(--accent2);color:var(--accent)}
+    main{max-width:1180px;margin:auto;padding:32px 20px 80px}
+    .view{display:none}.view.active{display:block}
+    .hero{display:grid;grid-template-columns:1.4fr .8fr;gap:24px;align-items:stretch;margin:18px 0 44px}
+    .hero>div{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:34px;box-shadow:var(--shadow)}
+    h1{font-size:clamp(32px,5vw,58px);line-height:1.03;letter-spacing:-.04em;margin:.15em 0}
+    h2{font-size:26px}.hero p,.section-head p{color:var(--muted);line-height:1.6}
+    .eyebrow{font-size:12px;letter-spacing:.13em;font-weight:800;color:var(--accent)}
+    .hero-card{display:flex;flex-direction:column;justify-content:center}
+    .flow{margin-top:16px;background:var(--accent2);padding:20px;border-radius:16px;line-height:1.8}
+    .primary,.secondary,.ghost{border:0;border-radius:12px;padding:11px 15px;cursor:pointer;font-weight:700}
+    .primary{background:var(--accent);color:#fff}.secondary{background:var(--accent2);color:var(--accent)}
+    .ghost{background:#f2eff5;color:var(--ink)}
+    .section-head{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:22px}
+    .section-head h1{font-size:42px}
+    .filters{display:grid;grid-template-columns:2fr repeat(4,1fr);gap:10px;margin-bottom:22px}
+    .filters input,.filters select{border:1px solid var(--border);background:#fff;border-radius:12px;padding:11px}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px;box-shadow:var(--shadow);
+      display:flex;flex-direction:column;gap:13px}
+    .card h3{margin:0;font-size:20px}.meta{display:flex;gap:8px;flex-wrap:wrap}
+    .pill{font-size:12px;padding:6px 8px;border-radius:999px;background:#f1eef5}
+    .pill.warn{background:#fff2df;color:var(--warn)}.pill.ok{background:#e6f6ed;color:var(--ok)}
+    .small{font-size:13px;color:var(--muted);line-height:1.5}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+    .source{color:var(--accent);text-decoration:none;font-weight:650}
+    .stack{display:grid;gap:14px}
+    .application{background:#fff;border:1px solid var(--border);border-radius:18px;padding:20px;
+      display:grid;grid-template-columns:1.4fr .8fr auto;gap:16px;align-items:center}
+    .application .next{background:var(--accent2);padding:14px;border-radius:14px}
+    .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+    .day{min-height:110px;background:#fff;border:1px solid var(--border);border-radius:14px;padding:10px}
+    .day strong{font-size:13px}.event{margin-top:8px;background:var(--accent2);color:var(--accent);padding:7px;border-radius:9px;font-size:12px}
+    dialog{width:min(760px,92vw);border:0;border-radius:22px;padding:0;box-shadow:0 25px 90px rgba(24,16,40,.26)}
+    dialog::backdrop{background:rgba(30,20,45,.38);backdrop-filter:blur(2px)}
+    #detailContent{padding:30px}.close{position:absolute;right:16px;top:14px;border:0;background:#f2eff5;border-radius:50%;
+      width:34px;height:34px;font-size:22px}
+    .detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:18px 0}
+    .detail-box{border:1px solid var(--border);padding:14px;border-radius:14px}
+    .notice{background:#fff2df;color:#744100;padding:14px;border-radius:14px}
+    @media(max-width:900px){.hero,.grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}
+      .application{grid-template-columns:1fr}.calendar{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:560px){.topbar{align-items:flex-start;gap:12px;flex-direction:column}.filters{grid-template-columns:1fr}
+      .calendar{grid-template-columns:1fr}.hero>div{padding:24px}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">OpportunityProof</div>
+    <nav>
+      <button data-view="home" class="nav active">Home</button>
+      <button data-view="opportunities" class="nav">Opportunities</button>
+      <button data-view="applications" class="nav">My Applications</button>
+      <button data-view="calendar" class="nav">Calendar</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home" class="view active">
+      <div class="hero">
+        <div>
+          <span class="eyebrow">IMPACT EDITION</span>
+          <h1>Turn scattered opportunities into action.</h1>
+          <p>Discover, inspect the source, surface uncertainty, track applications and protect deadlines in one workflow.</p>
+          <button class="primary" data-jump="opportunities">Browse opportunities</button>
+        </div>
+        <div class="hero-card">
+          <strong>Workflow</strong>
+          <div class="flow">discover → verify → decide → track → apply</div>
+        </div>
+      </div>
+      <h2>What fits right now?</h2>
+      <div id="recommended" class="grid"></div>
+    </section>
+
+    <section id="opportunities" class="view">
+      <div class="section-head"><div><h1>Opportunities</h1><p>Filter first. Verify uncertainty before investing time.</p></div></div>
+      <div class="filters">
+        <input id="search" placeholder="Search">
+        <select id="category"><option value="">All categories</option></select>
+        <select id="format"><option value="">Any format</option><option>Online</option><option>Offline</option><option>Hybrid</option></select>
+        <select id="funding"><option value="">Any funding</option><option>Fully funded</option><option>Free</option><option>Needs clarification</option></select>
+        <select id="status"><option value="">Any status</option><option>Open</option><option>Needs clarification</option></select>
+      </div>
+      <div id="opportunityList" class="grid"></div>
+    </section>
+
+    <section id="applications" class="view">
+      <div class="section-head"><div><h1>My Applications</h1><p>Keep next actions visible.</p></div></div>
+      <div id="applicationList" class="stack"></div>
+    </section>
+
+    <section id="calendar" class="view">
+      <div class="section-head">
+        <div><h1>Calendar</h1><p>Deadlines from tracked opportunities.</p></div>
+        <button id="exportIcs" class="secondary">Export .ics</button>
+      </div>
+      <div id="calendarGrid" class="calendar"></div>
+    </section>
+  </main>
+
+  <dialog id="detailDialog">
+    <button class="close" id="closeDialog">×</button>
+    <div id="detailContent"></div>
+  </dialog>
+
+<script>
+const opportunities = [
+  {id:'impact',title:'ImpactHack 2026',category:'Hackathon',format:'Online',funding:'Free',status:'Open',deadline:'2026-10-08',
+   organizer:'GIS Engineering Club',source:'https://impacthack26.devpost.com/',sourceHealth:'OK',lastChecked:'2026-10-07',
+   summary:'Build technology that solves a real problem or creates meaningful impact.',eligibility:['Students only','Online','Check official deadline'],
+   next:'Finalize source link and submission quality.'},
+  {id:'forge',title:'ForgeHacks Online 2026',category:'Hackathon',format:'Online',funding:'Free',status:'Open',deadline:'2026-10-10',
+   organizer:'ForgeHacks',source:'https://forgehacks-2026.devpost.com/',sourceHealth:'OK',lastChecked:'2026-10-07',
+   summary:'Student AI hackathon focused on real-world problems.',eligibility:['Students only','Solo allowed','Check project-period rule'],
+   next:'Define the meaningful new build contribution.'},
+  {id:'nextfounders',title:'Next Founders Hackathon',category:'Startup',format:'Online',funding:'Free',status:'Open',deadline:'2026-10-15',
+   organizer:'Student Organization',source:'https://next-founders.devpost.com/',sourceHealth:'OK',lastChecked:'2026-10-07',
+   summary:'Build a functional product with genuine market potential.',eligibility:['Students ages 13–22','Solo allowed','Online'],
+   next:'Prepare startup framing and scalability story.'},
+  {id:'nebius',title:'Nebius × NVIDIA Global AI Hackathon',category:'AI',format:'Online',funding:'Free',status:'Open',deadline:'2026-10-30',
+   organizer:'Nebius × NVIDIA',source:'https://nebiusglobalaihackathon.devpost.com/',sourceHealth:'OK',lastChecked:'2026-10-07',
+   summary:'Global AI hackathon requiring Nebius infrastructure and an NVIDIA open-source model.',
+   eligibility:['Age of majority','Global with standard exclusions','Technical platform requirements'],
+   next:'Choose a strong AI-native product direction.'},
+  {id:'graph',title:'Graphiques Innovation Challenge',category:'Business',format:'Online',funding:'Free',status:'Open',deadline:'2026-10-10',
+   organizer:'Hack Club',source:'https://graphiques-challenge.devpost.com/',sourceHealth:'OK',lastChecked:'2026-10-07',
+   summary:'Non-code innovation challenge covering business, finance and social impact.',
+   eligibility:['Students only','Non-code accepted','Global with standard exclusions'],
+   next:'Package the business case and impact logic.'}
+];
+
+let applicationIds = new Set(JSON.parse(localStorage.getItem('opportunityproof_apps') || '["impact"]'));
+let favorites = new Set(JSON.parse(localStorage.getItem('opportunityproof_favs') || '[]'));
+const qs=s=>document.querySelector(s), qsa=s=>[...document.querySelectorAll(s)];
+
+function saveState(){
+  localStorage.setItem('opportunityproof_apps',JSON.stringify([...applicationIds]));
+  localStorage.setItem('opportunityproof_favs',JSON.stringify([...favorites]));
+}
+function nav(view){
+  qsa('.view').forEach(x=>x.classList.toggle('active',x.id===view));
+  qsa('.nav').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
+  if(view==='applications') renderApplications();
+  if(view==='calendar') renderCalendar();
+}
+qsa('.nav').forEach(b=>b.onclick=()=>nav(b.dataset.view));
+qsa('[data-jump]').forEach(b=>b.onclick=()=>nav(b.dataset.jump));
+
+function card(o){
+  const warn=o.status==='Needs clarification';
+  return `<article class="card">
+    <div class="meta"><span class="pill">${o.category}</span><span class="pill">${o.format}</span><span class="pill ${warn?'warn':'ok'}">${o.status}</span></div>
+    <h3>${o.title}</h3>
+    <div class="small"><b>Deadline:</b> ${o.deadline}<br><b>Funding:</b> ${o.funding}<br><b>Source:</b> ${o.organizer}</div>
+    <p class="small">${o.summary}</p>
+    <div class="actions">
+      <button class="secondary" onclick="openDetail('${o.id}')">Details</button>
+      <button class="ghost" onclick="toggleFavorite('${o.id}')">${favorites.has(o.id)?'★ Saved':'☆ Save'}</button>
+      <button class="primary" onclick="toggleApplication('${o.id}')">${applicationIds.has(o.id)?'In applications':'Start application'}</button>
+    </div>
+  </article>`;
+}
+function renderRecommended(){qs('#recommended').innerHTML=opportunities.slice(0,3).map(card).join('')}
+function populateFilters(){
+  const cats=[...new Set(opportunities.map(o=>o.category))];
+  qs('#category').innerHTML+=cats.map(c=>`<option>${c}</option>`).join('');
+  ['search','category','format','funding','status'].forEach(id=>qs('#'+id).addEventListener('input',renderOpportunities));
+}
+function renderOpportunities(){
+  const s=qs('#search').value.trim().toLowerCase(),cat=qs('#category').value,fmt=qs('#format').value,
+        funding=qs('#funding').value,status=qs('#status').value;
+  const list=opportunities.filter(o=>
+    (!s||(o.title+' '+o.summary+' '+o.organizer).toLowerCase().includes(s))&&
+    (!cat||o.category===cat)&&(!fmt||o.format===fmt)&&(!funding||o.funding===funding)&&(!status||o.status===status));
+  qs('#opportunityList').innerHTML=list.length?list.map(card).join(''):'<p>No opportunities match these filters.</p>';
+}
+window.toggleFavorite=id=>{favorites.has(id)?favorites.delete(id):favorites.add(id);saveState();renderRecommended();renderOpportunities()}
+window.toggleApplication=id=>{applicationIds.has(id)?applicationIds.delete(id):applicationIds.add(id);saveState();renderRecommended();renderOpportunities();renderApplications()}
+window.openDetail=id=>{
+  const o=opportunities.find(x=>x.id===id);
+  qs('#detailContent').innerHTML=`
+    <div class="meta"><span class="pill">${o.category}</span><span class="pill">${o.format}</span><span class="pill ${o.status==='Needs clarification'?'warn':'ok'}">${o.status}</span></div>
+    <h2>${o.title}</h2><p>${o.summary}</p>
+    <div class="detail-grid">
+      <div class="detail-box"><b>Deadline</b><br>${o.deadline}</div>
+      <div class="detail-box"><b>Funding</b><br>${o.funding}</div>
+      <div class="detail-box"><b>Source health</b><br>${o.sourceHealth}</div>
+      <div class="detail-box"><b>Last checked</b><br>${o.lastChecked}</div>
+    </div>
+    <h3>Eligibility checks</h3><ul>${o.eligibility.map(x=>`<li>${x}</li>`).join('')}</ul>
+    <p><a class="source" href="${o.source}" target="_blank" rel="noopener">Open source ↗</a></p>`;
+  qs('#detailDialog').showModal();
+}
+qs('#closeDialog').onclick=()=>qs('#detailDialog').close();
+function renderApplications(){
+  const list=opportunities.filter(o=>applicationIds.has(o.id));
+  qs('#applicationList').innerHTML=list.length?list.map(o=>`
+    <div class="application">
+      <div><div class="meta"><span class="pill">${o.category}</span><span class="pill">${o.deadline}</span></div><h3>${o.title}</h3>
+      <a class="source" target="_blank" href="${o.source}">Source ↗</a></div>
+      <div class="next"><b>Next action</b><br><span class="small">${o.next}</span></div>
+      <div class="actions"><button class="secondary" onclick="openDetail('${o.id}')">Open</button><button class="ghost" onclick="toggleApplication('${o.id}')">Remove</button></div>
+    </div>`).join(''):'<p>No tracked applications yet.</p>';
+}
+function renderCalendar(){
+  const year=2026,month=9,first=new Date(year,month,1).getDay(),days=new Date(year,month+1,0).getDate();
+  const labels=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let html=labels.map(x=>`<div class="day"><strong>${x}</strong></div>`).join('');
+  for(let i=0;i<first;i++) html+='<div class="day"></div>';
+  for(let d=1;d<=days;d++){
+    const iso=`2026-10-${String(d).padStart(2,'0')}`;
+    const events=opportunities.filter(o=>applicationIds.has(o.id)&&o.deadline===iso);
+    html+=`<div class="day"><strong>${d}</strong>${events.map(e=>`<div class="event">${e.title}</div>`).join('')}</div>`;
+  }
+  qs('#calendarGrid').innerHTML=html;
+}
+qs('#exportIcs').onclick=()=>{
+  const events=opportunities.filter(o=>applicationIds.has(o.id)).map(o=>`BEGIN:VEVENT
+UID:${o.id}@opportunityproof
+DTSTART;VALUE=DATE:${o.deadline.replaceAll('-','')}
+SUMMARY:${o.title} deadline
+DESCRIPTION:Source: ${o.source}
+END:VEVENT`).join('\n');
+  const ics=`BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//OpportunityProof//EN
+${events}
+END:VCALENDAR`;
+  const blob=new Blob([ics],{type:'text/calendar'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='opportunityproof-deadlines.ics';a.click();URL.revokeObjectURL(a.href);
+};
+populateFilters();renderRecommended();renderOpportunities();renderApplications();renderCalendar();
+</script>
+</body>
+</html>
